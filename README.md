@@ -1,114 +1,188 @@
 # 🛡️ NetGuard Lab
-### Network Segmentation, Stateful Firewall & 3D Security Visualization
+### Network Segmentation | Linux Routing | Stateful Firewall Security
 
-![Status](https://img.shields.io/badge/Status-Completed-success)
-![Platform](https://img.shields.io/badge/Platform-GNS3%20%7C%20VMware-blue)
+![Project Status](https://img.shields.io/badge/Status-Completed-brightgreen)
+![Networking](https://img.shields.io/badge/Networking-GNS3-blue)
+![Virtualization](https://img.shields.io/badge/Virtualization-VMware-0078D4)
 ![Firewall](https://img.shields.io/badge/Firewall-nftables-red)
-![OS](https://img.shields.io/badge/OS-Debian%20%7C%20Ubuntu-orange)
-![Visualization](https://img.shields.io/badge/Visualization-Blender-purple)
+![Linux](https://img.shields.io/badge/Linux-Debian%20%7C%20Ubuntu-orange)
 
-**NetGuard Lab** is a virtual network security project designed to demonstrate network segmentation, Linux routing, stateful firewall filtering, and network traffic analysis.
+## 📖 Overview
 
-The lab was built using GNS3, VMware Workstation, Debian Linux, Ubuntu Server, and nftables.
+**NetGuard Lab** is a hands-on network security project designed to simulate a small enterprise network using virtualized infrastructure.
 
-A custom 3D animation created in Blender illustrates how network traffic is allowed or blocked according to firewall rules.
+The project focuses on implementing network segmentation, configuring Linux-based routing, and enforcing network security policies through a stateful firewall.
+
+Built using **GNS3, VMware Workstation, Debian Linux, Ubuntu Server, and nftables**, this lab demonstrates how network traffic can be controlled and monitored between separate network segments.
+
+The main objective is to allow legitimate communication while blocking unauthorized traffic.
 
 ---
 
-## 📌 Project Overview
+## 🎯 Project Objectives
 
-The objective of NetGuard Lab is to design and secure a small enterprise-style network consisting of two separate subnets.
+- Design a segmented network architecture.
+- Configure IPv4 addressing and default gateways.
+- Enable routing between two isolated subnets.
+- Deploy a Linux-based firewall using nftables.
+- Implement a default-deny forwarding policy.
+- Allow authorized HTTP communication.
+- Block unauthorized ICMP and SSH traffic.
+- Monitor dropped packets through firewall logs.
+- Validate security policies using practical network tests.
 
-The project demonstrates:
-
-- Network segmentation using IPv4 subnetting.
-- Inter-network routing through a Debian Linux router.
-- Stateful packet filtering using nftables.
-- Controlled access to an Apache web server.
-- Blocking unauthorized traffic.
-- Firewall logging and security verification.
-- 3D visualization of network traffic.
+---
 
 ## 🏗️ Network Architecture
 
-The infrastructure consists of two networks connected through a Debian router/firewall.
+The network consists of two subnets connected through a Debian Linux router acting as a firewall.
 
 ```text
-                NETGUARD LAB
-             Network Architecture
+                      NETGUARD LAB
+                 NETWORK ARCHITECTURE
 
-    LAN1 — EMPLOYEES
-      192.168.10.0/24
-
-    PC1          PC2         Windows Host
-192.168.10.10 192.168.10.11 192.168.10.254
-      |           |              |
-      +-----------+--------------+
-                  |
-          GNS3 / VMware VMnet2
-                  |
-         Debian Router / Firewall
-           192.168.10.1
-           192.168.20.1
-                  |
-          GNS3 / VMware VMnet1
-                  |
-      +-----------+-----------+
-      |                       |
- Ubuntu Server               PC3
- 192.168.20.10          192.168.20.20
- Apache HTTP
-      |
-    LAN2 — SERVERS
-    192.168.20.0/24
+               LAN 1 — EMPLOYEES
+                 192.168.10.0/24
+                          |
+           +--------------+--------------+
+           |              |              |
+          PC1            PC2        Windows Host
+     192.168.10.10  192.168.10.11  192.168.10.254
+           |              |              |
+           +--------------+--------------+
+                          |
+                  GNS3 / VMnet2
+                          |
+                +------------------+
+                |   DEBIAN ROUTER  |
+                |     FIREWALL     |
+                |                  |
+                | ens33: 10.1      |
+                | ens37: 20.1      |
+                |                  |
+                |     nftables     |
+                +------------------+
+                          |
+                  GNS3 / VMnet1
+                          |
+           +--------------+--------------+
+           |                             |
+      Ubuntu Server                     PC3
+     192.168.20.10                192.168.20.20
+       Apache HTTP
+           |                             |
+           +--------------+--------------+
+                          |
+                LAN 2 — SERVERS
+                 192.168.20.0/24
 ```
 
-The Debian router connects both networks and applies firewall rules to forwarded traffic.
+The Debian router provides Layer 3 connectivity between the two subnets and filters forwarded packets according to the configured security policy.
 
-## 🌐 IP Addressing
+---
 
-| Device | Interface / Network | IP Address | Role |
+## 🌐 IP Addressing Plan
+
+| Device | Interface | IP Address | Role |
 |---|---|---|---|
-| PC1 | LAN1 | 192.168.10.10/24 | Employee workstation |
-| PC2 | LAN1 | 192.168.10.11/24 | Employee workstation |
-| Windows Host | VMnet2 | 192.168.10.254/24 | Testing workstation |
-| Debian Router | ens33 | 192.168.10.1/24 | LAN1 gateway |
-| Debian Router | ens37 | 192.168.20.1/24 | LAN2 gateway |
-| Ubuntu Server | ens37 | 192.168.20.10/24 | Apache web server |
-| PC3 | LAN2 | 192.168.20.20/24 | Server-network workstation |
+| PC1 | LAN1 | `192.168.10.10/24` | Employee workstation |
+| PC2 | LAN1 | `192.168.10.11/24` | Employee workstation |
+| Windows Host | VMnet2 | `192.168.10.254/24` | Testing workstation |
+| Debian Router | ens33 | `192.168.10.1/24` | LAN1 gateway |
+| Debian Router | ens37 | `192.168.20.1/24` | LAN2 gateway |
+| Ubuntu Server | ens37 | `192.168.20.10/24` | Apache web server |
+| PC3 | LAN2 | `192.168.20.20/24` | Server-network workstation |
 
-**Additional management interface:** Ubuntu Server uses a separate NAT-connected interface for management.
+### Default Gateways
 
-## 🧰 Technologies Used
+**LAN1:** `192.168.10.1`
+
+**LAN2:** `192.168.20.1`
+
+The Ubuntu Server also has a separate NAT-connected interface used for management.
+
+---
+
+## 🧰 Technologies & Tools
 
 | Technology | Purpose |
 |---|---|
-| GNS3 | Network topology and simulation |
-| VMware Workstation | Virtual machine infrastructure |
-| Debian Linux | Routing and firewall |
-| Ubuntu Server | Web server hosting |
-| nftables | Stateful firewall filtering |
-| Apache HTTP Server | HTTP service |
-| VPCS | Virtual network clients |
-| Blender | Cinematic 3D network visualization |
+| GNS3 | Network topology design and emulation |
+| VMware Workstation | Virtual machine hosting |
+| Debian Linux | Router and firewall |
+| Ubuntu Server | Web server |
+| nftables | Stateful packet filtering |
+| Apache2 | HTTP service |
+| VPCS | Virtual client simulation |
+| Wireshark | Optional packet analysis |
+| Linux CLI | Network configuration and troubleshooting |
 
-## 🔐 Firewall Configuration
+---
 
-NetGuard Lab uses a stateful firewall based on **nftables**.
+## ⚙️ Network Configuration
 
-The firewall controls traffic forwarded between LAN1 and LAN2.
+### 1. Enable IPv4 Forwarding
+
+IPv4 forwarding must be enabled on the Debian router to allow traffic to pass between network interfaces.
+
+Check the current setting:
+
+```bash
+sysctl net.ipv4.ip_forward
+```
+
+Enable forwarding:
+
+```bash
+sudo sysctl -w net.ipv4.ip_forward=1
+```
+
+To make the setting persistent, add the following line to a sysctl configuration file:
+
+```text
+net.ipv4.ip_forward=1
+```
+
+### 2. Verify Network Interfaces
+
+```bash
+ip -br addr
+```
+
+Expected router interfaces:
+
+```text
+ens33    192.168.10.1/24
+ens37    192.168.20.1/24
+```
+
+### 3. Verify Routing
+
+```bash
+ip route
+```
+
+The router should have connected routes to both subnets.
+
+---
+
+## 🔐 Firewall Implementation
+
+NetGuard Lab uses **nftables**, the modern Linux packet filtering framework.
+
+The firewall applies a default-deny policy to forwarded traffic.
 
 ### Security Policy
 
-| Traffic | Source | Destination | Decision |
+| Protocol | Source | Destination | Action |
 |---|---|---|---|
-| HTTP (TCP/80) | LAN1 | Ubuntu Server | ✅ ALLOW |
-| ICMP Echo Request | LAN1 | Ubuntu Server | ❌ DROP |
-| SSH (TCP/22) | LAN1 | Ubuntu Server | ❌ DROP |
-| Established/Related | Existing connections | Return traffic | ✅ ALLOW |
+| HTTP TCP/80 | LAN1 | Ubuntu Server | ✅ ALLOW |
+| ICMP Echo | LAN1 | Ubuntu Server | ❌ DROP |
+| SSH TCP/22 | LAN1 | Ubuntu Server | ❌ DROP |
+| Established / Related | Existing connections | Return traffic | ✅ ALLOW |
 | Other forwarded traffic | Any | Any | ❌ DROP |
 
-### Example nftables Rules
+### nftables Configuration
 
 ```nft
 table inet netguard {
@@ -129,90 +203,112 @@ table inet netguard {
 }
 ```
 
-**Important:** These rules filter forwarded traffic. They do not define equivalent restrictions for traffic destined to the firewall itself.
+### Explanation
 
-## 🧪 Security Testing
+**Default DROP Policy**
 
-The firewall policy was validated through connectivity and service tests.
+All forwarded traffic is blocked unless explicitly permitted.
 
-### Test 1 — HTTP Access
+**Stateful Filtering**
 
-**Objective:** Verify that authorized HTTP traffic reaches the Ubuntu web server.
+The firewall tracks established and related connections using connection tracking.
+
+**HTTP Access Rule**
+
+Clients from LAN1 are permitted to initiate HTTP connections to the Ubuntu Server on TCP port 80.
+
+**Logging**
+
+Dropped packets are logged with the prefix `NETGUARD_DROP`, subject to rate limiting.
+
+**Scope:** This ruleset filters forwarded traffic. It does not independently restrict traffic addressed to the Debian router itself.
+
+---
+
+## 🧪 Security Testing & Validation
+
+The configured firewall was tested to verify that the security policy works as intended.
+
+### Test 1 — HTTP Communication
+
+**Objective:** Verify that clients from LAN1 can access the Apache web server.
+
+Command:
 
 ```bash
 curl -I http://192.168.20.10
 ```
 
-**Result:**
+Observed response:
 
 ```text
 HTTP/1.1 200 OK
 ```
 
-**Status:** ✅ PASSED
+**Result: PASS**
+
+Authorized HTTP traffic successfully traversed the firewall.
 
 ### Test 2 — ICMP Filtering
 
-**Objective:** Verify that ping traffic from LAN1 to the Ubuntu Server is blocked.
+**Objective:** Verify that ICMP Echo traffic from LAN1 to the Ubuntu Server is blocked.
+
+Command:
 
 ```bash
 ping 192.168.20.10
 ```
 
-**Result:** ICMP requests are blocked by the firewall.
+**Result: PASS**
 
-**Status:** ✅ PASSED
+ICMP Echo traffic was blocked by the forwarding policy.
 
 ### Test 3 — SSH Filtering
 
-**Objective:** Verify that unauthorized SSH connections from LAN1 to the Ubuntu Server are blocked.
+**Objective:** Verify that TCP connections to port 22 on the Ubuntu Server are blocked from LAN1.
 
-**Destination:** `192.168.20.10:22`
+Target:
 
-**Result:** TCP/22 traffic is blocked by the forwarding policy.
+```text
+192.168.20.10:22
+```
 
-**Status:** ✅ PASSED
+**Result: PASS**
+
+SSH connection attempts were blocked by the firewall.
 
 ### Test 4 — Firewall Logging
 
-Dropped packets are logged using the prefix:
+**Objective:** Confirm that denied packets generate firewall log entries.
 
-```text
-NETGUARD_DROP :
-```
-
-Logs can be inspected on the Debian router using:
+Command:
 
 ```bash
 sudo journalctl -k | grep NETGUARD_DROP
 ```
 
-**Status:** ✅ PASSED
+Observed log prefix:
 
-## 🎬 3D Network Visualization
+```text
+NETGUARD_DROP :
+```
 
-A custom cinematic animation was developed using **Blender and Python scripting**.
+**Result: PASS**
 
-The visualization demonstrates:
+The firewall generated logs for denied traffic.
 
-- The segmented network architecture.
-- HTTP requests passing through the firewall.
-- Authorized communication with the Ubuntu Server.
-- ICMP traffic being blocked.
-- SSH traffic being blocked.
-- Reactive firewall effects and security logs.
+---
 
-**Animation specifications:**
+## 📊 Test Results Summary
 
-| Property | Value |
-|---|---|
-| Software | Blender |
-| Resolution | 1920 × 1080 |
-| Frame Rate | 24 FPS |
-| Duration | 30 seconds |
-| Style | Isometric 3D / Cybersecurity |
+| Test | Expected Result | Observed Result | Status |
+|---|---|---|---|
+| HTTP TCP/80 | Allowed | HTTP 200 OK | ✅ PASS |
+| ICMP Echo | Blocked | Request blocked | ✅ PASS |
+| SSH TCP/22 | Blocked | Connection blocked | ✅ PASS |
+| Firewall Logging | Drop events recorded | NETGUARD_DROP logs | ✅ PASS |
 
-The animation is a visual explanation of the lab's tested security policy, not a live packet capture.
+---
 
 ## 📂 Repository Structure
 
@@ -223,50 +319,64 @@ NetGuard-Lab/
 ├── LICENSE
 ├── .gitignore
 │
+├── configs/
+│   └── nftables.conf
+│
 ├── docs/
 │   ├── architecture.md
 │   ├── installation.md
 │   └── security-testing.md
 │
-├── configs/
-│   └── nftables.conf
-│
-├── screenshots/
-│   ├── topology.png
-│   └── firewall-demo.png
-│
-└── animation/
-    └── README.md
+└── screenshots/
+    ├── gns3-topology.png
+    ├── http-success.png
+    └── firewall-logs.png
 ```
 
-Supporting files and screenshots can be added as the documentation is finalized.
-
-## 🚀 Future Improvements
-
-Potential future extensions include:
-
-- IDS/IPS integration using Suricata.
-- Centralized security logging.
-- Network monitoring dashboards.
-- VLAN-based segmentation.
-- Additional firewall policies.
-- Automated security testing.
-
-## 🎯 Learning Outcomes
-
-Through this project, I gained practical experience with:
-
-- Virtual network design.
-- IPv4 addressing and routing.
-- Linux network administration.
-- Stateful firewall configuration.
-- Network security testing.
-- Troubleshooting virtualized environments.
-- Technical documentation.
-- Python-based 3D visualization.
+*Supporting configuration files, documentation, and screenshots will be added progressively.*
 
 ---
 
-### ⭐ NetGuard Lab — Building, Securing & Visualizing Networks
+## 🧠 Skills Developed
 
-*A hands-on networking and cybersecurity project.*
+This project provided practical experience in:
+
+- IPv4 addressing and subnetting.
+- Network segmentation.
+- Linux routing and IP forwarding.
+- Network virtualization with GNS3 and VMware.
+- Stateful firewall configuration.
+- Access control policies.
+- Network connectivity testing.
+- Linux system administration.
+- Firewall log analysis.
+- Network troubleshooting.
+
+---
+
+## 🚀 Future Improvements
+
+Planned improvements include:
+
+- Integrating Suricata for intrusion detection.
+- Implementing VLAN-based segmentation.
+- Deploying centralized logging.
+- Adding a network monitoring dashboard.
+- Developing additional firewall rules.
+- Automating network security validation.
+
+---
+
+## 📌 Project Status
+
+**Version:** 1.0
+
+**Status:** Core lab implemented and security tests completed.
+
+**Focus:** Network Security | Linux | Firewall Administration
+
+---
+
+### ⭐ NetGuard Lab — Securing Networks Through Practical Implementation
+
+*A hands-on cybersecurity and networking laboratory.*
