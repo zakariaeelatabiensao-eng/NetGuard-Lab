@@ -309,6 +309,63 @@ The firewall generated logs for denied traffic.
 | Firewall Logging | Drop events recorded | NETGUARD_DROP logs | ✅ PASS |
 
 ---
+---
+
+## 📸 Lab Screenshots
+
+The following screenshots document the real implementation
+and validation of NetGuard Lab.
+
+### 1. Network Topology
+
+![GNS3 Network Topology](screenshots/01-network-topology.png)
+
+### 2. Debian Network Interfaces
+
+![Debian Interfaces](screenshots/02-debian-interfaces.png)
+
+### 3. Routing Configuration
+
+![Debian Routing Table](screenshots/03-debian-routing.png)
+
+### 4. IPv4 Forwarding
+
+![IPv4 Forwarding](screenshots/04-ip-forwarding.png)
+
+### 5. Ubuntu Server Configuration
+
+![Ubuntu Network Interfaces](screenshots/05-ubuntu-interfaces.png)
+
+### 6. nftables Firewall Rules
+
+![Firewall Configuration](screenshots/06-firewall-rules.png)
+
+### 7. HTTP Traffic — Allowed
+
+![HTTP Allowed](screenshots/07-http-allowed.png)
+
+### 8. ICMP Traffic — Blocked
+
+![ICMP Blocked](screenshots/08-icmp-blocked.png)
+
+### 9. SSH Traffic — Blocked
+
+![SSH Blocked](screenshots/09-ssh-blocked.png)
+
+### 10. Firewall Logging
+
+![Firewall Logs](screenshots/10-firewall-logs.png)
+
+---
+
+## 📚 Technical Documentation
+
+| Document | Description |
+|---|---|
+| [Network Architecture](docs/architecture.md) | Network topology, IP addressing and routing |
+| [Installation Guide](docs/installation.md) | Step-by-step lab deployment |
+| [Security Testing](docs/security-testing.md) | Firewall validation and test results |
+| [Firewall Configuration](configs/nftables.conf) | Stateful nftables ruleset |
 
 ## 📂 Repository Structure
 
