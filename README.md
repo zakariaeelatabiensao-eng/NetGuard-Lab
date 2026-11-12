@@ -376,6 +376,16 @@ Planned improvements include:
 **Focus:** Network Security | Linux | Firewall Administration
 
 ---
+## 📚 Documentation
+
+Explore the technical documentation:
+
+| Document | Description |
+|---|---|
+| [Network Architecture](docs/architecture.md) | Network topology, IP addressing and routing |
+| [Installation Guide](docs/installation.md) | Step-by-step lab deployment |
+| [Security Testing](docs/security-testing.md) | Firewall validation and test results |
+| [Firewall Configuration](configs/nftables.conf) | nftables ruleset |
 
 ### ⭐ NetGuard Lab — Securing Networks Through Practical Implementation
 
